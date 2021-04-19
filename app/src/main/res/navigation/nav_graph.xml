@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/mapFragment">
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.blankymunn3.localkeywordsearch.feature.fragment.map.MapFragment"
+        android:label="map_fragment"
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/navToSearchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.blankymunn3.localkeywordsearch.feature.fragment.search.SearchFragment"
+        android:label="search_fragment"
+        tools:layout="@layout/fragment_search">
+        <argument
+            android:name="uId"
+            app:argType="integer" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_searchFragment"
+        app:destination="@id/searchFragment" />
+</navigation>
