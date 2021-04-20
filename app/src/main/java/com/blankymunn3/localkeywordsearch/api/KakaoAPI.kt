@@ -1,6 +1,7 @@
 package com.blankymunn3.localkeywordsearch.api
 
 import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query

@@ -11,11 +11,9 @@ import com.kakao.util.maps.helper.Utility
 
 class MainActivity : BaseActivity() {
     private val binding by binding<ActivityMainBinding>(R.layout.activity_main)
-    val viewModel by GetViewModel(MainViewModel::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.viewModel = viewModel
         binding.lifecycleOwner = this@MainActivity
         findNavController(R.id.nav_host_fragment)
 
