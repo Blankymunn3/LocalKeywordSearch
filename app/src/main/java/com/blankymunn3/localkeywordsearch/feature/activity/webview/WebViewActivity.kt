@@ -36,4 +36,9 @@ class WebViewActivity: BaseActivity() {
         binding.webView.settings.loadWithOverviewMode = true
         binding.webView.settings.domStorageEnabled = true
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.hold, R.anim.slide_right)
+    }
 }

@@ -5,15 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +19,9 @@ import com.blankymunn3.localkeywordsearch.adapter.SearchRVAdapter
 import com.blankymunn3.localkeywordsearch.databinding.FragmentSearchBinding
 import com.blankymunn3.localkeywordsearch.feature.activity.main.MainActivity
 import com.blankymunn3.localkeywordsearch.feature.activity.webview.WebViewActivity
+import com.blankymunn3.localkeywordsearch.model.State
 import com.blankymunn3.localkeywordsearch.util.GetViewModel
+import com.blankymunn3.localkeywordsearch.util.OnClickItemListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
@@ -53,6 +52,7 @@ class SearchFragment: Fragment() {
         viewModel.kakaoKey.postValue("KakaoAK ${activity.getString(R.string.kakao_rest_api_key)}")
         fusedLocationClient.lastLocation.addOnSuccessListener { location : Location? ->
             if (location != null) {
+                Log.e("Location", "${location.longitude}, ${location.latitude}")
                 viewModel.x.postValue(location.longitude.toString())
                 viewModel.y.postValue(location.latitude.toString())
             }
@@ -68,10 +68,10 @@ class SearchFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchRVAdapter = SearchRVAdapter()
+        searchRVAdapter = SearchRVAdapter { viewModel.retry() }
         binding.rvSearchResponse.apply {
-            layoutManager = GridLayoutManager(requireContext(), 1)
             setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(activity)
             isNestedScrollingEnabled = false
             adapter = searchRVAdapter
         }
@@ -88,42 +88,32 @@ class SearchFragment: Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 CoroutineScope(Main).launch {
                     delay(500)
+                    viewModel.keyword.postValue(newText)
                 }
                 return true
             }
         })
 
-        searchRVAdapter.setOnClickItem(object : SearchRVAdapter.OnClickItemListener {
+        searchRVAdapter.setOnClickItem(object : OnClickItemListener {
             override fun onClickItem(position: Int) {
                 val intent = Intent(activity, WebViewActivity::class.java)
-                intent.putExtra("EXTRA_TITLE", viewModel.documents.value!![position].placeName)
-                intent.putExtra("EXTRA_URL", viewModel.documents.value!![position].placeUrl)
+                intent.putExtra("EXTRA_TITLE", viewModel.searchList.value!![position]!!.placeName)
+                intent.putExtra("EXTRA_URL", viewModel.searchList.value!![position]!!.placeUrl)
                 startActivity(intent)
-            }
-        })
-
-        binding.rvSearchResponse.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val lastVisibleItemPosition =
-                    (binding.rvSearchResponse.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-                val itemTotalCount = binding.rvSearchResponse.adapter!!.itemCount
-                if (lastVisibleItemPosition == itemTotalCount) viewModel.page.postValue(viewModel.page.value!! + 1)
+                activity.overridePendingTransition(R.anim.slide_left, R.anim.hold)
             }
         })
 
         viewModel.keyword.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()) viewModel.getSearchKeywordResponse()
+            viewModel.getSearchResponse()
         })
 
-        viewModel.documents.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()) {
-                searchRVAdapter.setData(it)
-            }
+        viewModel.searchList.observe(viewLifecycleOwner, {
+            searchRVAdapter.submitList(it)
         })
 
-        viewModel.page.observe(viewLifecycleOwner, {
-            if (it > 1) viewModel.getSearchKeywordResponse()
+        viewModel.getState().observe(viewLifecycleOwner, {
+            if (!viewModel.listIsEmpty()) searchRVAdapter.setState(it ?: State.DONE)
         })
     }
 }

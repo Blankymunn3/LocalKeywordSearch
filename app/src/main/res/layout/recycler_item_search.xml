@@ -37,7 +37,7 @@
                     android:layout_marginBottom="5dp"
                     app:layout_constraintBottom_toTopOf="@+id/tv_address_name"
                     app:layout_constraintStart_toEndOf="@+id/iv_location"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_arr_url"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -57,11 +57,21 @@
                     android:layout_height="wrap_content"
                     android:text="distance"
                     android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_arr_url"
                     app:layout_constraintTop_toBottomOf="@+id/tv_place_name"
                     app:layout_constraintStart_toEndOf="@+id/tv_address_name"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    />
 
+                <ImageView
+                    android:id="@+id/iv_arr_url"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arr_right"
+                    android:padding="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
